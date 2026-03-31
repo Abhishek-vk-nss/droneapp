@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Ops | Command Center</title>
+    <style>
+        :root {
+            --neon-green: #00ff41;
+            --deep-blue: #00d2ff;
+            --glass: rgba(0, 0, 0, 0.8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Consolas', 'Courier New', monospace; }
+
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* --- FLOATING GREEN WATER EFFECT --- */
+        .water-glow {
+            position: absolute;
+            bottom: -100px;
+            left: -50%;
+            width: 200%;
+            height: 300px;
+            background: radial-gradient(circle, var(--neon-green) 0%, transparent 70%);
+            opacity: 0.2;
+            filter: blur(60px);
+            animation: waveFlow 8s infinite ease-in-out;
+            z-index: -1;
+        }
+
+        @keyframes waveFlow {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+        }
+
+        /* --- SIDE MENU --- */
+        #sideMenu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background: var(--glass);
+            border-right: 2px solid var(--neon-green);
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 80px 25px;
+            z-index: 1000;
+        }
+        #sideMenu.active { left: 0; }
+
+        .menu-btn {
+            position: fixed; top: 20px; left: 20px; z-index: 1100;
+            background: rgba(0,0,0,0.7); border: 1px solid var(--neon-green);
+            color: var(--neon-green); padding: 10px 15px; cursor: pointer;
+            letter-spacing: 2px; font-weight: bold;
+        }
+
+        /* --- TELEMETRY DATA --- */
+        .telemetry-card {
+            background: rgba(255,255,255,0.05);
+            border-left: 3px solid var(--neon-green);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .label { font-size: 0.6rem; color: var(--neon-green); margin-bottom: 5px; text-transform: uppercase; }
+
+        /* Battery Icon */
+        .bat-box { display: flex; align-items: center; gap: 10px; }
+        .bat-shell { width: 40px; height: 18px; border: 2px solid #666; position: relative; }
+        .bat-shell::after { content: ''; position: absolute; right: -5px; top: 3px; width: 3px; height: 8px; background: #666; }
+        .bat-level { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); width: 0%; transition: 1s; }
+
+        /* Signal Blocks */
+        .sig-row { display: flex; gap: 4px; margin-top: 5px; }
+        .block { width: 15px; height: 15px; background: #222; border: 1px solid #444; }
+        .block.active { background: var(--deep-blue); border-color: var(--deep-blue); box-shadow: 0 0 10px var(--deep-blue); }
+
+        /* --- MAIN UI --- */
+        .punchy-title {
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            background: linear-gradient(90deg, #fff, var(--neon-green), #fff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+            filter: drop-shadow(0 0 10px rgba(0,255,65,0.3));
+            margin-bottom: 10px;
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 40px 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .btn {
+            display: block; width: 100%; padding: 18px; margin: 15px 0;
+            border: none; border-radius: 10px;
+            background: linear-gradient(45deg, #004e92, #000428);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            font-weight: bold; font-size: 0.9rem;
+            cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .btn:hover { background: var(--neon-green); color: #000; transform: translateY(-3px); }
+
+        /* Download Popup */
+        #popup {
+            display: none; position: fixed; bottom: 30px; width: 85%; max-width: 350px;
+            background: #000; border: 1px solid var(--neon-green); padding: 20px; z-index: 2000;
+        }
+        .progress-bar { height: 4px; background: var(--neon-green); width: 0%; margin-top: 10px; }
+
+        footer { position: absolute; bottom: 30px; text-align: center; letter-spacing: 2px; }
+        .name { color: var(--neon-green); font-weight: bold; display: block; font-size: 1.2rem; margin-top: 5px; text-shadow: 0 0 10px var(--neon-green); }
+    </style>
+</head>
+<body>
+
+    <div class="water-glow"></div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <button class="menu-btn" onclick="toggleMenu()">☰ SYSTEM DATA</button>
+
+    <div id="sideMenu">
+        <div class="telemetry-card">
+            <p class="label">Battery Status</p>
+            <div class="bat-box">
+                <div class="bat-shell"><div class="bat-level" id="bat-fill"></div></div>
+                <span id="bat-pct">--%</span>
+            </div>
+        </div>
+
+        <div class="telemetry-card">
+            <p class="label">Link Quality (RSSI)</p>
+            <div class="sig-row" id="sig-row">
+                <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+            </div>
+            <p id="dbm-val" style="color:var(--deep-blue); font-size:0.8rem; margin-top:10px;">-65 dBm</p>
+        </div>
+    </div>
+
+    <h1 class="punchy-title">DRONE OPS</h1>
+
+    <div class="glass-panel">
+        <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.6;">PROJECT ASSET DOWNLOADS</p>
+        
+        <button class="btn" onclick="handleDownload('files/Drone.zip')">Download CAD Model</button>
+       <button class="btn" onclick="openPlayStore()">Download Android App</button>
+        
+        <p style="font-size: 10px; margin-top: 15px; color: #888;">Tap anywhere to initialize audio stream</p>
+    </div>
+
+    <div id="popup">
+        <p style="font-size: 0.8rem; color: var(--neon-green);">INITIALIZING SECURE DOWNLOAD...</p>
+        <div style="background:#222; width:100%; height:4px; margin-top:10px;">
+            <div class="progress-bar" id="bar"></div>
+        </div>
+    </div>
+
+    <footer>
+        DESIGNED BY
+        <span class="name">ABHISHEK VK</span>
+    </footer>
+
+    <script>
+        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); }
+
+        // Start music on first click
+        document.body.addEventListener('click', () => {
+            document.getElementById('bgMusic').play().catch(()=>{});
+        }, { once: true });
+
+        // Battery System
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(bat => {
+                const update = () => {
+                    document.getElementById('bat-fill').style.width = (bat.level * 100) + "%";
+                    document.getElementById('bat-pct').innerText = Math.round(bat.level * 100) + "%";
+                };
+                update();
+                bat.onlevelchange = update;
+            });
+        }
+
+        // Signal System (dBm Blocks)
+        function updateSignal() {
+            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            const blocks = document.querySelectorAll('.block');
+            const dbmText = document.getElementById('dbm-val');
+            
+            blocks.forEach(b => b.classList.remove('active'));
+            let active = 4;
+            let dbm = -70;
+
+            if (conn && conn.downlink > 10) { active = 5; dbm = -45; }
+            for(let i=0; i<active; i++) blocks[i].classList.add('active');
+            dbmText.innerText = dbm + " dBm (STABLE)";
+        }
+        updateSignal();
+
+function openPlayStore() {
+    window.open("https://play.google.com/store/apps/details?id=appinventor.ai_makerslabfablab.Arm_Robot_Control", "_blank");
+}
+
+        // Download System
+        function handleDownload(url) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = url.split('/').pop();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            const popup = document.getElementById('popup');
+            const bar = document.getElementById('bar');
+            popup.style.display = 'block';
+            
+            let w = 0;
+            const int = setInterval(() => {
+                if (w >= 100) {
+                    clearInterval(int);
+                    setTimeout(() => { popup.style.display = 'none'; }, 800);
+                } else {
+                    w += 2; bar.style.width = w + "%";
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>
