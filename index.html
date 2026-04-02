@@ -53,7 +53,7 @@
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.8);
             z-index: 10;
-            margin-bottom: 100px; /* Space for video */
+            margin-top: -50px; /* Adjusted for status bar */
         }
 
         .btn {
@@ -75,23 +75,35 @@
         .btn-primary { background: var(--accent); color: #000; }
         .btn:active { transform: scale(0.98); }
 
-        /* --- VIDEO PORTION --- */
+        /* --- FIXED VIDEO PORTION --- */
         .video-container {
             position: fixed;
             bottom: 0;
             width: 100%;
-            height: 150px;
+            height: 180px; /* Increased height for better visibility */
             background: #000;
-            border-top: 1px solid var(--accent);
+            border-top: 2px solid var(--accent);
             overflow: hidden;
-            pointer-events: none; /* Disables clicking/interaction */
+            pointer-events: none;
+            z-index: 5;
         }
 
-        .video-container iframe {
+        .video-wrapper {
+            position: relative;
             width: 100%;
-            height: 300%; /* Oversized to hide UI elements */
-            margin-top: -75px;
-            opacity: 0.6;
+            height: 100%;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100vw;
+            height: 56.25vw; /* 16:9 Aspect Ratio */
+            min-height: 180px;
+            min-width: 320px;
+            transform: translate(-50%, -50%); /* Centers the video perfectly */
+            opacity: 0.7;
         }
 
         /* --- MODALS --- */
@@ -136,10 +148,12 @@
 
         footer {
             position: fixed;
-            bottom: 160px;
+            bottom: 195px; /* Sits right above the video border */
             font-size: 0.6rem;
             opacity: 0.5;
             text-align: center;
+            width: 100%;
+            z-index: 6;
         }
     </style>
 </head>
@@ -164,7 +178,9 @@
     </div>
 
     <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/9fhgz0oA3kM?autoplay=1&mute=1&controls=0&loop=1&playlist=9fhgz0oA3kM&rel=0&showinfo=0&iv_load_policy=3" frameborder="0" allow="autoplay"></iframe>
+        <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/9fhgz0oA3kM?autoplay=1&mute=1&controls=0&loop=1&playlist=9fhgz0oA3kM&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1" frameborder="0" allow="autoplay"></iframe>
+        </div>
     </div>
 
     <div id="authModal">
