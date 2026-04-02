@@ -2,259 +2,255 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drone Ops | Command Center</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Drone Ops | Secure Access</title>
     <style>
-        :root {
-            --neon-green: #00ff41;
-            --deep-blue: #00d2ff;
-            --glass: rgba(0, 0, 0, 0.8);
+        :root { 
+            --accent: #ffaa00; 
+            --bg: #0a0a0a; 
+            --glass: rgba(20, 20, 20, 0.9); 
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Consolas', 'Courier New', monospace; }
-
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Consolas', 'Segoe UI', sans-serif; }
+        
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('bg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            height: 100vh;
-            display: flex;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            height: 100vh; 
+            display: flex; 
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            overflow: hidden;
+            justify-content: center; 
+            align-items: center; 
+            color: #eee; 
+            overflow: hidden; 
         }
 
-        /* --- FLOATING GREEN WATER EFFECT --- */
-        .water-glow {
-            position: absolute;
-            bottom: -100px;
-            left: -50%;
-            width: 200%;
-            height: 300px;
-            background: radial-gradient(circle, var(--neon-green) 0%, transparent 70%);
-            opacity: 0.2;
-            filter: blur(60px);
-            animation: waveFlow 8s infinite ease-in-out;
-            z-index: -1;
-        }
-
-        @keyframes waveFlow {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-30px) scale(1.1); }
-        }
-
-        /* --- SIDE MENU --- */
-        #sideMenu {
+        /* --- TOP STATUS BAR --- */
+        .status-bar {
             position: fixed;
             top: 0;
-            left: -300px;
-            width: 300px;
-            height: 100%;
-            background: var(--glass);
-            border-right: 2px solid var(--neon-green);
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            padding: 80px 25px;
-            z-index: 1000;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid rgba(255, 170, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 20px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            z-index: 3000;
+            letter-spacing: 1px;
         }
-        #sideMenu.active { left: 0; }
-
-        .menu-btn {
-            position: fixed; top: 20px; left: 20px; z-index: 1100;
-            background: rgba(0,0,0,0.7); border: 1px solid var(--neon-green);
-            color: var(--neon-green); padding: 10px 15px; cursor: pointer;
-            letter-spacing: 2px; font-weight: bold;
-        }
-
-        /* --- TELEMETRY DATA --- */
-        .telemetry-card {
-            background: rgba(255,255,255,0.05);
-            border-left: 3px solid var(--neon-green);
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .label { font-size: 0.6rem; color: var(--neon-green); margin-bottom: 5px; text-transform: uppercase; }
-
-        /* Battery Icon */
-        .bat-box { display: flex; align-items: center; gap: 10px; }
-        .bat-shell { width: 40px; height: 18px; border: 2px solid #666; position: relative; }
-        .bat-shell::after { content: ''; position: absolute; right: -5px; top: 3px; width: 3px; height: 8px; background: #666; }
-        .bat-level { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); width: 0%; transition: 1s; }
-
-        /* Signal Blocks */
-        .sig-row { display: flex; gap: 4px; margin-top: 5px; }
-        .block { width: 15px; height: 15px; background: #222; border: 1px solid #444; }
-        .block.active { background: var(--deep-blue); border-color: var(--deep-blue); box-shadow: 0 0 10px var(--deep-blue); }
 
         /* --- MAIN UI --- */
-        .punchy-title {
-            font-size: 3rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            background: linear-gradient(90deg, #fff, var(--neon-green), #fff);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 3s linear infinite;
-            filter: drop-shadow(0 0 10px rgba(0,255,65,0.3));
-            margin-bottom: 10px;
-        }
-
-        @keyframes shine { to { background-position: 200% center; } }
-
         .glass-panel {
-            background: var(--glass);
+            background: var(--glass); 
             backdrop-filter: blur(15px);
-            padding: 40px 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid rgba(255,255,255,0.1);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 30px; 
+            border-radius: 24px; 
+            width: 90%; 
+            max-width: 360px;
+            border: 1px solid rgba(255, 170, 0, 0.2); 
             text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            z-index: 10;
+            margin-bottom: 100px; /* Space for video */
         }
 
         .btn {
-            display: block; width: 100%; padding: 18px; margin: 15px 0;
-            border: none; border-radius: 10px;
-            background: linear-gradient(45deg, #004e92, #000428);
-            border: 1px solid var(--neon-green);
-            color: var(--neon-green);
-            font-weight: bold; font-size: 0.9rem;
-            cursor: pointer; transition: 0.3s;
-            text-transform: uppercase; letter-spacing: 1px;
+            display: block; 
+            width: 100%; 
+            padding: 14px; 
+            margin: 10px 0;
+            border-radius: 12px; 
+            background: #111; 
+            border: 1px solid var(--accent);
+            color: var(--accent); 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-transform: uppercase;
+            transition: 0.3s;
+            font-size: 0.8rem;
         }
 
-        .btn:hover { background: var(--neon-green); color: #000; transform: translateY(-3px); }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn:active { transform: scale(0.98); }
 
-        /* Download Popup */
-        #popup {
-            display: none; position: fixed; bottom: 30px; width: 85%; max-width: 350px;
-            background: #000; border: 1px solid var(--neon-green); padding: 20px; z-index: 2000;
+        /* --- VIDEO PORTION --- */
+        .video-container {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 150px;
+            background: #000;
+            border-top: 1px solid var(--accent);
+            overflow: hidden;
+            pointer-events: none; /* Disables clicking/interaction */
         }
-        .progress-bar { height: 4px; background: var(--neon-green); width: 0%; margin-top: 10px; }
 
-        footer { position: absolute; bottom: 30px; text-align: center; letter-spacing: 2px; }
-        .name { color: var(--neon-green); font-weight: bold; display: block; font-size: 1.2rem; margin-top: 5px; text-shadow: 0 0 10px var(--neon-green); }
+        .video-container iframe {
+            width: 100%;
+            height: 300%; /* Oversized to hide UI elements */
+            margin-top: -75px;
+            opacity: 0.6;
+        }
+
+        /* --- MODALS --- */
+        #authModal, #uploadModal {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); 
+            z-index: 4000; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: #151515; 
+            padding: 30px; 
+            border-radius: 20px; 
+            border: 1px solid var(--accent); 
+            width: 100%; 
+            max-width: 320px; 
+            text-align: center;
+        }
+
+        input {
+            width: 100%; padding: 14px; margin: 15px 0; background: #000;
+            border: 1px solid #333; color: var(--accent); text-align: center; 
+            border-radius: 10px; font-size: 1rem; outline: none;
+        }
+
+        /* --- ANIMATION --- */
+        .loader {
+            width: 40px; height: 40px;
+            border: 3px solid #333;
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        footer {
+            position: fixed;
+            bottom: 160px;
+            font-size: 0.6rem;
+            opacity: 0.5;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="water-glow"></div>
+    <div class="status-bar">
+        <span id="date-time">LOADING...</span>
+        <span id="bat-level">BAT: --%</span>
+    </div>
 
     <audio id="bgMusic" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">
     </audio>
 
-    <button class="menu-btn" onclick="toggleMenu()">☰ SYSTEM DATA</button>
-
-    <div id="sideMenu">
-        <div class="telemetry-card">
-            <p class="label">Battery Status</p>
-            <div class="bat-box">
-                <div class="bat-shell"><div class="bat-level" id="bat-fill"></div></div>
-                <span id="bat-pct">--%</span>
-            </div>
-        </div>
-
-        <div class="telemetry-card">
-            <p class="label">Link Quality (RSSI)</p>
-            <div class="sig-row" id="sig-row">
-                <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
-            </div>
-            <p id="dbm-val" style="color:var(--deep-blue); font-size:0.8rem; margin-top:10px;">-65 dBm</p>
-        </div>
-    </div>
-
-    <h1 class="punchy-title">DRONE OPS</h1>
-
     <div class="glass-panel">
-        <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.6;">PROJECT ASSET DOWNLOADS</p>
+        <h2 style="color:var(--accent); letter-spacing:3px; margin-bottom: 5px;">DRONE OPS</h2>
+        <p style="font-size: 0.65rem; opacity: 0.5; margin-bottom: 20px;">VSSC PROJECT TERMINAL</p>
         
-        <button class="btn" onclick="handleDownload('files/Dronenew.zip')">Download CAD Model</button>
-       <button class="btn" onclick="openPlayStore()">Download Android App</button>
-        
-        <p style="font-size: 10px; margin-top: 15px; color: #888;">Tap anywhere to initialize audio stream</p>
+        <button class="btn btn-primary" onclick="showAuth()">Download CAD Model</button>
+        <button class="btn" onclick="window.open('https://play.google.com/store/apps/details?id=appinventor.ai_makerslabfablab.Arm_Robot_Control', '_blank')">Android Control App</button>
+        <button class="btn" onclick="showUpload()">PC Software</button>
     </div>
 
-    <div id="popup">
-        <p style="font-size: 0.8rem; color: var(--neon-green);">INITIALIZING SECURE DOWNLOAD...</p>
-        <div style="background:#222; width:100%; height:4px; margin-top:10px;">
-            <div class="progress-bar" id="bar"></div>
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/9fhgz0oA3kM?autoplay=1&mute=1&controls=0&loop=1&playlist=9fhgz0oA3kM&rel=0&showinfo=0&iv_load_policy=3" frameborder="0" allow="autoplay"></iframe>
+    </div>
+
+    <div id="authModal">
+        <div class="modal-box">
+            <p style="color:var(--accent); font-size:0.8rem;">IDENTITY VERIFICATION</p>
+            <input type="text" id="regInput" placeholder="NSS24ME000" autocomplete="off">
+            <button class="btn btn-primary" onclick="validateAccess()">VERIFY & DOWNLOAD</button>
+            <button onclick="closeAuth()" style="background:none; border:none; color:#666; font-size:0.7rem; margin-top:10px; cursor:pointer;">CANCEL</button>
+            <p id="errorBox" style="color:#ff4444; font-size:0.7rem; margin-top:12px; display:none;">ACCESS DENIED</p>
+        </div>
+    </div>
+
+    <div id="uploadModal">
+        <div class="modal-box">
+            <div class="loader"></div>
+            <p style="color:var(--accent); font-size:1rem; letter-spacing: 2px;">UPLOADING...</p>
+            <p style="color:#666; font-size:0.7rem; margin-top:10px;">COMING SOON</p>
+            <button class="btn" style="margin-top:20px;" onclick="document.getElementById('uploadModal').style.display='none'">BACK</button>
         </div>
     </div>
 
     <footer>
-        DESIGNED BY
-        <span class="name">ABHISHEK VK</span>
+        DESIGNED BY <span style="color:var(--accent); font-weight:bold;">ABHISHEK VK</span>
     </footer>
 
     <script>
-        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); }
+        const studentData = {
+            "NSS24ME008": "Abhijith Vasudevan",
+            "NSS24ME012": "ME - TEST",
+            "NSS24ME013": "Abijith Krishna",
+            "NSS24ME015": "Thomas Stephen",
+            "NSS24ME020": "Ajmal",
+            "NSS24ME022": "Akbar",
+            "NSS24ME024": "Alvin",
+            "NSS24ME025": "Ameen",
+            "NSS24ME032": "Anirudh R",
+            "NSS24ME033": "Arjun krishna",
+            "NSS24ME038": "Athul Krishna",
+            "NSS24ME040": "Bharath",
+            "NSS24ME045": "Druvaa",
+            "LNSS24ME142": "Dhanish",
+            "NSS23ME044": "Anuyukth"
+        };
 
-        // Start music on first click
-        document.body.addEventListener('click', () => {
-            document.getElementById('bgMusic').play().catch(()=>{});
+        const mediafireLink = "https://www.mediafire.com/file/yfwjk7vsp1nluog/Dronenew.zip/file";
+
+        // Status Bar Logic
+        function updateStatus() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString([], {day:'2-digit', month:'short'});
+            const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false});
+            document.getElementById('date-time').innerText = `${dateStr} | ${timeStr}`;
+
+            if('getBattery' in navigator) {
+                navigator.getBattery().then(bat => {
+                    document.getElementById('bat-level').innerText = `BAT: ${Math.round(bat.level * 100)}%`;
+                });
+            }
+        }
+        setInterval(updateStatus, 1000);
+        updateStatus();
+
+        function showAuth() { document.getElementById('authModal').style.display = 'flex'; document.getElementById('regInput').focus(); }
+        function closeAuth() { document.getElementById('authModal').style.display = 'none'; }
+        function showUpload() { document.getElementById('uploadModal').style.display = 'flex'; }
+
+        function validateAccess() {
+            const inputID = document.getElementById('regInput').value.trim().toUpperCase();
+            if (studentData[inputID]) {
+                const name = studentData[inputID];
+                const fID = "1FAIpQLSdcRB2g5X5Nk9vvTQjnZz_TP2QSRN0LPWpvxHtBkQCeDsjhRg"; 
+                const eID_Reg = "entry.1225511078"; 
+                const eID_Name = "entry.1398758621"; 
+                const logURL = `https://docs.google.com/forms/d/e/${fID}/formResponse?${eID_Reg}=${inputID}&${eID_Name}=${encodeURIComponent(name)}&submit=Submit`;
+                
+                fetch(logURL, { mode: 'no-cors' });
+                window.open(mediafireLink, "_blank");
+                closeAuth();
+            } else {
+                document.getElementById('errorBox').style.display = 'block';
+            }
+        }
+
+        document.body.addEventListener('click', () => { 
+            document.getElementById('bgMusic').play().catch(()=>{}); 
         }, { once: true });
-
-        // Battery System
-        if ('getBattery' in navigator) {
-            navigator.getBattery().then(bat => {
-                const update = () => {
-                    document.getElementById('bat-fill').style.width = (bat.level * 100) + "%";
-                    document.getElementById('bat-pct').innerText = Math.round(bat.level * 100) + "%";
-                };
-                update();
-                bat.onlevelchange = update;
-            });
-        }
-
-        // Signal System (dBm Blocks)
-        function updateSignal() {
-            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-            const blocks = document.querySelectorAll('.block');
-            const dbmText = document.getElementById('dbm-val');
-            
-            blocks.forEach(b => b.classList.remove('active'));
-            let active = 4;
-            let dbm = -70;
-
-            if (conn && conn.downlink > 10) { active = 5; dbm = -45; }
-            for(let i=0; i<active; i++) blocks[i].classList.add('active');
-            dbmText.innerText = dbm + " dBm (STABLE)";
-        }
-        updateSignal();
-
-function openPlayStore() {
-    window.open("https://play.google.com/store/apps/details?id=appinventor.ai_makerslabfablab.Arm_Robot_Control", "_blank");
-}
-
-        // Download System
-        function handleDownload(url) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = url.split('/').pop();
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            const popup = document.getElementById('popup');
-            const bar = document.getElementById('bar');
-            popup.style.display = 'block';
-            
-            let w = 0;
-            const int = setInterval(() => {
-                if (w >= 100) {
-                    clearInterval(int);
-                    setTimeout(() => { popup.style.display = 'none'; }, 800);
-                } else {
-                    w += 2; bar.style.width = w + "%";
-                }
-            }, 100);
-        }
     </script>
 </body>
 </html>
